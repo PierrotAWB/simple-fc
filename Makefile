@@ -8,12 +8,13 @@ else
 	CFLAGS = -Wall -Wextra
 endif
 
-objects = main.o
+objects = main.o cmd.o
 
 all: $(objects)
 	$(CC) $(CFLAGS) -o simplefc $(objects)
 
-main.o: defs.h
+%.o: %.c defs.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -f simplefc $(objects)
