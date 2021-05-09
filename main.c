@@ -1,5 +1,6 @@
 #include "cmd.h"
 #include "defs.h"
+#include "return_codes.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
@@ -118,7 +119,7 @@ dispatch(char *cmd)
 
 	for (word = strtok_r(cmd, " \t", &context);
 			word != NULL;
-			word = strtok_r(NULL, "\t", &context)) {
+			word = strtok_r(NULL, " \t", &context)) {
 		if (nargs >= MAX_CMD_ARGS)
 			return E_TOO_MANY_ARGS;
 		args[nargs++] = word;
@@ -158,28 +159,14 @@ run(void) /* TODO: Accept arguments */
 
 		switch (result) {
 			case E_UNKNOWN_CMD:
-				fprintf(stderr, "Unknown command: \"%s\".\n", cmd);
+				fprintf(stderr, "Unknown command: \"%s\".\n\n", cmd);
 				break;
 			case E_TOO_MANY_ARGS:
-				fprintf(stderr, "Too many arguments.");
+				fprintf(stderr, "Too many arguments.\n\n");
 		}
 	}
 
 	free(cmd);
-	
-//  			case 'L':
-//  				/* Load more cards */
-//  			case 'l':
-//  				/* Learning mode */
-//  			case 'p':
-//  				/* Practice mode */
-//  			case 't':
-//  				/* Test mode */
-//  				break;
-//  			default:
-//  				printf("Unrecognized option.\n");
-//  		}
-//  	}
 }
 
 int

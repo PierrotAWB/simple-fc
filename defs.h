@@ -4,11 +4,6 @@
 #include "cmd.h"
 #include <stdlib.h>
 
-/* Return codes */
-#define SUCCESS 		0
-#define E_UNKNOWN_CMD 	1
-#define E_TOO_MANY_ARGS 2
-
 struct Card {
 	const char *front;
 	const char *back;
