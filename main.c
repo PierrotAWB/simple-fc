@@ -18,6 +18,7 @@ static void setup(void);
 static void teardown(void);
 
 static struct Card **cards;
+
 static size_t cardsCapacity = 10;
 static size_t numCards = 0;
 
@@ -72,9 +73,13 @@ populateCards(char *filename)
 			currCard->back = readFace(cardFile, BACK_TAG_CLOSE);
 
 			if (currCard->front && currCard->back) {
-				if (numCards > cardsCapacity) {
-					cards = (struct Card **) realloc(cards,
-							2 * cardsCapacity * sizeof(struct Card *));
+				if (numCards >= cardsCapacity) {
+					struct Card **tmp = realloc(cards, sizeof *tmp * (2*cardsCapacity));
+					if (tmp)
+					{
+						cards = tmp;
+						cardsCapacity *= 2;
+					}
 				}
 				cards[numCards++] = currCard;
 			}

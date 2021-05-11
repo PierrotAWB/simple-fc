@@ -47,7 +47,7 @@ cmd_learn(int nargs, char **args)
 {
 	(void) nargs;
 	(void) args;
-	printf("Enter learn mode.\n");
+	printf("Entering learn mode.\n");
 	return 0;
 }
 
@@ -56,7 +56,7 @@ cmd_practice(int nargs, char **args)
 {
 	(void) nargs;
 	(void) args;
-	printf("Enter practice mode.\n");
+	printf("Entering practice mode.\n");
 	return 0;
 }
 
@@ -65,7 +65,7 @@ cmd_test(int nargs, char **args)
 {
 	(void) nargs;
 	(void) args;
-	printf("Enter test mode.\n");
+	printf("Entering test mode.\n");
 	return 0;
 }
 
