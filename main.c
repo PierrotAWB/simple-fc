@@ -2,26 +2,22 @@
 #include "defs.h"
 #include "main.h"
 #include "return_codes.h"
+#include "time.h"
 #include <stdbool.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-/* Macros */
-#define IS_PREFIX(pref, str) !strncmp((str), (pref), sizeof((pref))-1)
-#define STRIP(s) (s)[strcspn((s), "\n")] = 0
 
 static int dispatch(char *cmd);
 static void run(void);
 static void setup(void);
 static void teardown(void);
 
-static struct Card **cards;
-
 static size_t cardsCapacity = 10;
-static size_t numCards = 0;
 
+/* Globals */
+struct Card **cards;
+size_t numCards = 0;
 bool shouldRun = 1;
 
 char *
@@ -33,13 +29,19 @@ readFace(FILE *cardFile, const char *sentinel)
 	char line[MAX_CARD_FACE_CHARS], text[MAX_CARD_FACE_CHARS];
 	text[0] = '\0';
 
+	// TODO: replace fgets with getline()
 	while (fgets(line, sizeof(line), cardFile)) {
 		if (IS_PREFIX(sentinel, line)) break;
 		// TODO: Strip leading whitespace.
 		strncat(text, line, (int) strlen(line));
 	}
 
-	return (strlen(text) > 0) ? strdup(text) : NULL;
+	if (strlen(text) > 0) {
+		STRIP(text);
+		return strdup(text);
+	} else {
+		return NULL;
+	}
 }
 
 int
@@ -60,6 +62,7 @@ populateCards(char *filename)
 	int cardsLoaded = 0;
 	char line[MAX_CARD_FACE_CHARS];
 
+	// TODO: replace fgets() with getline()
 	while (fgets(line, sizeof(line), cardFile)) {
 		if (IS_PREFIX(FRONT_TAG_OPEN, line)) {
 			struct Card *currCard = malloc(sizeof(struct Card *));
@@ -106,6 +109,9 @@ setup(void)
 		populateCards(line);
 	}
 	fclose(catalogue);
+
+	/* Set seed for rand(). */
+	srand(time(NULL));
 }
 
 void
@@ -147,7 +153,7 @@ dispatch(char *cmd)
 }
 
 void
-run(void) /* TODO: Accept arguments */
+run(void)
 {
 	printf("%s\n", STARTUP_MESSAGE);
 	printf("You currently have %ld cards loaded.\n\n", numCards);
