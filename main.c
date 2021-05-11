@@ -1,5 +1,6 @@
 #include "cmd.h"
 #include "defs.h"
+#include "main.h"
 #include "return_codes.h"
 #include <stdbool.h>
 #include <string.h>
@@ -12,7 +13,6 @@
 #define STRIP(s) (s)[strcspn((s), "\n")] = 0
 
 static int dispatch(char *cmd);
-static void populateCards(char *filename);
 static void run(void);
 static void setup(void);
 static void teardown(void);
@@ -42,7 +42,7 @@ readFace(FILE *cardFile, const char *sentinel)
 	return (strlen(text) > 0) ? strdup(text) : NULL;
 }
 
-void
+int
 populateCards(char *filename)
 {
 	char path[MAX_FILEPATH_LENGTH];
@@ -53,10 +53,11 @@ populateCards(char *filename)
 	FILE *cardFile = fopen(path, "r");
 
 	if (!cardFile) {
-		fprintf(stderr, "Unable to open file \"%s\"\n.", path);
-		return;
+		fprintf(stderr, "Unable to open file \"%s\".\n\n", path);
+		return 0;
 	}
 
+	int cardsLoaded = 0;
 	char line[MAX_CARD_FACE_CHARS];
 
 	while (fgets(line, sizeof(line), cardFile)) {
@@ -82,9 +83,12 @@ populateCards(char *filename)
 					}
 				}
 				cards[numCards++] = currCard;
+				++cardsLoaded;
 			}
 		}
 	}
+
+	return cardsLoaded;
 }
 
 void

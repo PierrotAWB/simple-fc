@@ -5,4 +5,6 @@
 
 extern bool shouldRun; 
 
+int populateCards(char *fileName);
+
 #endif /* MAIN_H */

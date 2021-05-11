@@ -36,9 +36,16 @@ cmd_help(int nargs, char **args)
 int
 cmd_load(int nargs, char **args)
 {
-	(void) nargs;
-	(void) args;
-	printf("Do load.\n");
+	if (nargs == 1) {
+		printf("Expected path to card-file.\n\n");
+	} else {
+		int cardsLoaded;
+		for (int i = 1; i < nargs; ++i) {
+			cardsLoaded = populateCards(args[i]);
+			printf("Successfully loaded %d cards from %s.\n", cardsLoaded, args[i]);
+		}
+		printf("\n");
+	}
 	return 0;
 }
 
