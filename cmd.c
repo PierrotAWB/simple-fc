@@ -59,10 +59,14 @@ cmd_learn(int nargs, char **args)
 	(void) args;
 
 	printf("Welcome to learn mode.\n\n"
+
 		   "Each round, you'll be presented with the front of a card, whose back\n"
-		   "face can be inputting any sequence of characters\n"
+		   "face can be revealed by inputting any sequence of characters\n"
 		   "and pressing enter (the exception is 'q', which quits learn mode).\n\n"
-		   "Note that the input is whitespace and case sensitive.\n\n"
+
+		   "Note that the input is whitespace and case sensitive.\n"
+		   "If your input matches the back face exactly, you will be told so.\n"
+		   "Otherwise, you'll be given what the back face reads.\n\n"
 
 		   "There is no time limit, and no data will be recorded.\n\n");
 
