@@ -27,21 +27,22 @@ readFace(FILE *cardFile, const char *sentinel)
 	// What if we have an unpaired <front> or <back>?
 
 	char line[MAX_CARD_FACE_CHARS], text[MAX_CARD_FACE_CHARS];
+	int tmp = 0;
 	text[0] = '\0';
 
 	// TODO: replace fgets with getline()
 	while (fgets(line, sizeof(line), cardFile)) {
 		if (IS_PREFIX(sentinel, line)) break;
-		// TODO: Strip leading whitespace.
-		strncat(text, line, (int) strlen(line));
+		tmp = 0;
+		while (isspace((unsigned char) *(line + tmp++))) { continue; }
+		strncat(text, line + tmp - 1, (int) strlen(line) - tmp + 1);
 	}
 
 	if (strlen(text) > 0) {
 		STRIP(text);
 		return strdup(text);
-	} else {
+	} else 
 		return NULL;
-	}
 }
 
 int
@@ -166,7 +167,7 @@ run(void)
 
 	while (shouldRun) {
 		printf("Enter a command ['?' or 'h' for menu]: ");
-		
+
 		getline(&cmd, &sz, stdin);
 		STRIP(cmd);
 

@@ -7,7 +7,7 @@
 
 /* Macros */
 #define IS_PREFIX(pref, str) !strncmp((str), (pref), sizeof((pref))-1)
-#define STRIP(s) (s)[strcspn((s), "\n")] = 0
+#define STRIP(s) (s)[strlen(s) - 1] = 0
 
 struct Card {
 	const char *front;
