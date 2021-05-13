@@ -9,11 +9,13 @@
 #include <ctype.h>
 
 static int dispatch(char *cmd);
+static FILE *openCardFile(char *cardFilePath);
 static void run(void);
 static void setup(void);
 static void teardown(void);
 
 static size_t cardsCapacity = 10;
+static char *simpleFcHome = NULL;
 
 /* Globals */
 struct Card **cards;
@@ -45,18 +47,28 @@ readFace(FILE *cardFile, const char *sentinel)
 		return NULL;
 }
 
-int
-populateCards(char *filename)
+FILE *
+openCardFile(char *cardFilePath)
 {
-	char path[MAX_FILEPATH_LENGTH];
-	STRIP(filename);
+	STRIP(cardFilePath);
+	if (cardFilePath[0] == '/') {
+		/* Path is absolute; don't prepend anything. */
+		return fopen(cardFilePath, "r");
+	}
 
-	strcpy(path, "example/");
-	strcat(path, filename);
-	FILE *cardFile = fopen(path, "r");
+	char *path = malloc(MAX_FILEPATH_LENGTH * sizeof(char *));
+	strcpy(path, simpleFcHome);
+	strcat(path, cardFilePath);
+	return fopen(path, "r");
+}
+
+int
+populateCards(char *cardFilePath)
+{
+	FILE *cardFile = openCardFile(cardFilePath);
 
 	if (!cardFile) {
-		fprintf(stderr, "Unable to open file \"%s\".\n\n", path);
+		fprintf(stderr, "Unable to open file \"%s\".\n\n", cardFilePath);
 		return 0;
 	}
 
@@ -98,18 +110,24 @@ populateCards(char *filename)
 void
 setup(void)
 {
-	/* Malloc card */
+	char line[MAX_FILEPATH_LENGTH], cataloguePath[MAX_FILEPATH_LENGTH];
+
 	cards = malloc(cardsCapacity * sizeof(struct Card *));
 
-	/* Read from file; path temporarily hard-coded */
-	FILE *catalogue = fopen("example/catalogue.txt", "r");;
+	char *dataHome = getenv("XDG_DATA_HOME");
+	simpleFcHome = strcat(dataHome, "/simplefc/");
+	strcpy(cataloguePath, simpleFcHome);
+	strcat(cataloguePath, "catalogue");
 
-	char line[MAX_FILEPATH_LENGTH];
+	FILE *catalogue = fopen(cataloguePath, "r");
 
-	while (fgets(line, sizeof(line), catalogue)) {
-		populateCards(line);
+	if (catalogue == NULL) {
+		printf("Could not find catalogue file at $XDG_DATA_HOME/simplefc/catalogue.\n"
+			   "Please add catalogue, or load cards manually with the 'L' command.\n\n");
+	} else {
+		while (fgets(line, sizeof(line), catalogue)) { populateCards(line); }
+		fclose(catalogue);
 	}
-	fclose(catalogue);
 
 	/* Set seed for rand(). */
 	srand(time(NULL));
@@ -123,7 +141,6 @@ teardown(void)
 
 	return;
 }
-
 
 static
 int
@@ -157,7 +174,7 @@ void
 run(void)
 {
 	printf("%s\n", STARTUP_MESSAGE);
-	printf("You currently have %ld cards loaded.\n\n", numCards);
+	printf("You currently have %ld card(s) loaded.\n\n", numCards);
 
 	char *cmd; 
 	size_t sz = MAX_CMD_LENGTH;
