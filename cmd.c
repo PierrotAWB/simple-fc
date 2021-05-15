@@ -55,8 +55,9 @@ cmd_load(int nargs, char **args)
 int
 cmd_learn(int nargs, char **args)
 {
-	(void) nargs;
-	(void) args;
+	bool randomOrder = true;
+
+	if (nargs == 2 && !strcmp("--in-order", args[1])) randomOrder &= false;
 
 	printf("Welcome to learn mode.\n\n"
 
@@ -70,12 +71,17 @@ cmd_learn(int nargs, char **args)
 
 		   "There is no time limit, and no data will be recorded.\n\n");
 
-	int idx;
+	if (!randomOrder)
+		printf("Learn mode has been run with the --in-order flag. Randomization\n"
+			   "has been turned off.\n\n");
+
+
+	int idx = -1;
 	size_t sz = MAX_CMD_LENGTH;
 	char *input = malloc(sz);
 
 	while (1) {
-		idx = rand() % numCards;
+		idx = (randomOrder) ? rand() % numCards : (idx + 1) % numCards;
 		printf("---\n%s\n---\n", cards[idx]->front);
 
 		getline(&input, &sz, stdin);
