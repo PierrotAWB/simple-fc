@@ -11,7 +11,7 @@
 static int dispatch(char *cmd);
 static FILE *openCardFile(char *cardFilePath);
 static void run(void);
-static void setup(void);
+static void setup(char *);
 static void teardown(void);
 
 static size_t cardsCapacity = 10;
@@ -108,7 +108,7 @@ populateCards(char *cardFilePath)
 }
 
 void
-setup(void)
+setup(char *catalogueName)
 {
 	char line[MAX_FILEPATH_LENGTH], cataloguePath[MAX_FILEPATH_LENGTH];
 
@@ -117,7 +117,11 @@ setup(void)
 	char *dataHome = getenv("XDG_DATA_HOME");
 	simpleFcHome = strcat(dataHome, "/simplefc/");
 	strcpy(cataloguePath, simpleFcHome);
-	strcat(cataloguePath, "catalogue");
+
+	if (catalogueName == NULL)
+		strcat(cataloguePath, "catalogue");
+	else 
+		strcat(cataloguePath, catalogueName);
 
 	FILE *catalogue = fopen(cataloguePath, "r");
 
@@ -203,9 +207,12 @@ run(void)
 }
 
 int
-main(void)
+main(int argc, char **argv)
 {
-	setup();
+	if (argc == 2)
+		setup(argv[1]);
+	else if (argc == 1) 
+		setup(NULL);
 	run();
 	teardown();
 	return SUCCESS;
